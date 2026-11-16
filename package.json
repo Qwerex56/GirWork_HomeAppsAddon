@@ -12,6 +12,7 @@
     "pack": "npm run build && homemix pack"
   },
   "dependencies": {
+    "@home-apps/vue": "^2.4.0",
     "@homemix/vue": "file:../../../Documents/RiderProjects/HomeApps/src/Web/homemix/vue",
     "vue": "^3.5.41"
   },
