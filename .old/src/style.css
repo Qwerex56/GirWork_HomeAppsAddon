@@ -1,0 +1,27 @@
+html, body, #app {
+  margin: 0;
+  min-height: 100%;
+  min-height: 100vh;
+  font-family: Inter, 'Segoe UI', sans-serif;
+  background: #020817;
+}
+
+body {
+  min-height: 100vh;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
