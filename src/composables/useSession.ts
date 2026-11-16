@@ -1,31 +1,37 @@
 import { ref } from 'vue'
 import * as api from '../api/client'
+import { localTokenStore } from '../homemix/localTokenStore'
+import type { TokenStore } from '../homemix/tokenStore'
 
-const TOKEN_KEY = 'gir_access_token'
+// One session for the whole app.
+let store: TokenStore = localTokenStore
+const token = ref('')
+const restored = ref(false)
+const employeeId = ref<number | null>(null)
 
-function readStoredToken(): string {
+/** Picks where the token lives (HomeMix data inside HomeApps) and reads the saved one. Call once at start. */
+async function restore(next: TokenStore = localTokenStore): Promise<void> {
+  store = next
   try {
-    return localStorage.getItem(TOKEN_KEY) ?? ''
+    token.value = await store.read()
   } catch {
-    return ''
+    token.value = ''
+  } finally {
+    restored.value = true
   }
 }
 
-// One session for the whole app.
-const token = ref(readStoredToken())
-const employeeId = ref<number | null>(null)
-
 async function login(username: string, password: string): Promise<void> {
   const newToken = await api.login(username, password)
-  localStorage.setItem(TOKEN_KEY, newToken)
+  await store.write(newToken)
   token.value = newToken
   employeeId.value = null
 }
 
 function logout(): void {
-  localStorage.removeItem(TOKEN_KEY)
   token.value = ''
   employeeId.value = null
+  store.clear().catch(() => {})
 }
 
 async function requireEmployeeId(): Promise<number> {
@@ -45,7 +51,7 @@ async function withToken<T>(action: (token: string) => Promise<T>): Promise<T> {
 }
 
 export function useSession() {
-  return { token, login, logout, requireEmployeeId, withToken }
+  return { token, restored, restore, login, logout, requireEmployeeId, withToken }
 }
 
 export function errorMessage(error: unknown, fallback: string): string {
