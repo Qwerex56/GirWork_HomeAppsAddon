@@ -1,4 +1,10 @@
+<script lang="ts">
+let lastPointerY = 0
+window.addEventListener('pointerdown', (event) => (lastPointerY = event.pageY), { capture: true })
+</script>
+
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import type { ShiftDetail } from '../api/types'
 import { formatLongDate, formatTime } from '../domain/dates'
 import { colleagueName, initials, isShiftManager, sortColleagues } from '../domain/roster'
@@ -12,13 +18,19 @@ defineProps<{
 
 const emit = defineEmits<{ close: [] }>()
 
+// Inside HomeApps the frame is as tall as the page and never scrolls, so a centred dialog could open far from the
+// clicked day: open it next to where the person clicked and bring it into view.
+const dialog = ref<HTMLElement | null>(null)
+const top = ref(lastPointerY)
+onMounted(() => dialog.value?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+
 const hours = (start?: string | null, end?: string | null) =>
   start && end ? `${formatTime(start)}–${formatTime(end)}` : ''
 </script>
 
 <template>
   <div class="backdrop" @click.self="emit('close')">
-    <div class="card modal" role="dialog" aria-modal="true">
+    <div ref="dialog" class="card modal" role="dialog" aria-modal="true" :style="{ '--top': `${top}px` }">
       <header>
         <h3>{{ formatLongDate(date) }}</h3>
         <button class="button small" type="button" @click="emit('close')">Zamknij</button>
@@ -34,10 +46,10 @@ const hours = (start?: string | null, end?: string | null) =>
   
           <ul v-if="shift.Colleagues?.length">
             <li v-for="person in sortColleagues(shift.Colleagues)" :key="person.Id" :class="{ manager: isShiftManager(person) }">
-              <span
-                class="avatar"
-                :style="person.Image ? { backgroundImage: `url('${person.Image}')` } : undefined"
-              >{{ person.Image ? '' : initials(person) }}</span>
+              <span class="avatar">
+                {{ initials(person) }}
+                <img v-if="person.Image" :src="person.Image" alt="" @error="($event.target as HTMLElement).remove()" />
+              </span>
               <span class="who">
                 <strong>{{ colleagueName(person) }}</strong>
                 <small class="muted">{{ hours(person.ShiftStart, person.ShiftEnd) }}</small>
@@ -66,6 +78,15 @@ const hours = (start?: string | null, end?: string | null) =>
   width: min(560px, 100%);
   max-height: 85vh;
   overflow-y: auto;
+}
+
+.in-homemix .backdrop {
+  align-items: start;
+}
+
+.in-homemix .modal {
+  margin-top: max(0px, calc(var(--top) - 160px));
+  max-height: none;
 }
 
 header {
@@ -111,9 +132,20 @@ li.manager {
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: var(--surface-1) center / cover;
+  background: var(--surface-1);
   font-size: 0.75rem;
   font-weight: 700;
+  position: relative;
+  overflow: hidden;
+}
+
+/* The photo covers the initials when it loads; HomeMix's sandbox blocks images from other sites. */
+.avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .who {

@@ -1,11 +1,14 @@
 :root {
+  /* Inside HomeApps the host's theme (--p-*) wins; on its own the app keeps its dark look. */
   --bg: #0b1120;
-  --surface-1: #111a2e;
+  --surface-1: var(--p-content-background, #111a2e);
   --surface-2: #17223a;
-  --border: rgb(148 163 184 / 0.2);
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --blue: #60a5fa;
+  --border: var(--p-content-border-color, rgb(148 163 184 / 0.2));
+  --text: var(--p-text-color, #e2e8f0);
+  --muted: var(--p-text-muted-color, #94a3b8);
+  --primary: var(--p-primary-color, #2563eb);
+  --primary-text: var(--p-primary-contrast-color, white);
+  --blue: var(--p-primary-color, #60a5fa);
   --green: #22c55e;
   --amber: #f59e0b;
   --red: #f87171;
@@ -17,6 +20,17 @@
   background: var(--bg);
 }
 
+:root.in-homemix {
+  --bg: transparent;
+  /* A shade between the card and the text, so it works with HomeApps' light and dark themes alike. */
+  --surface-2: color-mix(in srgb, var(--text) 7%, var(--surface-1));
+  color-scheme: light;
+}
+
+:root.in-homemix.hm-dark {
+  color-scheme: dark;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -25,6 +39,14 @@ body {
   margin: 0;
   min-height: 100vh;
   background: var(--bg);
+}
+
+.in-homemix body {
+  min-height: 0;
+}
+
+.in-homemix .app {
+  padding: 0;
 }
 
 button,
@@ -98,8 +120,8 @@ select {
 
 .button.primary {
   border-color: transparent;
-  background: #2563eb;
-  color: white;
+  background: var(--primary);
+  color: var(--primary-text);
 }
 
 .button.ghost {
