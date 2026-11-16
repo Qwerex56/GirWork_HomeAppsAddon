@@ -1,0 +1,20 @@
+{
+  "homemixVersion": 1,
+  "id": "gir-czas-pracy",
+  "version": "1.0.0",
+  "requires": { "homeApps": "2.3.0" },
+  "name": { "pl": "Czas pracy GIR", "en": "GIR work time" },
+  "description": {
+    "pl": "Nieoficjalny podgląd godzin, grafiku i wniosków o zmianę z GIR. Logujesz się swoim kontem GIR; nic nie trafia do HomeApps poza tokenem sesji.",
+    "en": "An unofficial view of your GIR hours, roster and shift requests. You sign in with your GIR account; HomeApps keeps only the session token."
+  },
+  "icon": "pi-clock",
+  "entry": "index.html",
+  "targets": ["User"],
+  "pages": [{ "path": "", "title": { "pl": "Czas pracy", "en": "Work time" }, "menu": true }],
+  "widgets": [
+    { "id": "month", "title": { "pl": "Godziny w tym miesiącu", "en": "Hours this month" }, "size": "Small", "places": ["Account"] }
+  ],
+  "capabilities": ["storage.user"],
+  "network": ["https://gotogir.com", "https://v5api.workforce.mapal-os.com"]
+}

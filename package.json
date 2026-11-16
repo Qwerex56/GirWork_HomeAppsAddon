@@ -6,15 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mix": "vite build --watch & homemix dev",
+    "check": "npm run build && homemix check",
+    "pack": "npm run build && homemix pack"
   },
   "dependencies": {
+    "@homemix/vue": "file:../../../Documents/RiderProjects/HomeApps/src/Web/homemix/vue",
     "vue": "^3.5.41"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.9.1",
+    "homemix": "file:../../../Documents/RiderProjects/HomeApps/src/Web/homemix/cli",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
     "vue-tsc": "^3.3.11"
