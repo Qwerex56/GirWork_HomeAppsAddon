@@ -25,3 +25,4 @@ dist-ssr
 
 # HomeMix package (npm run pack)
 addon.zip
+*.tgz

@@ -1,4 +1,4 @@
-import type { useHomeMix } from '@homemix/vue'
+import type { useHomeMix } from '@home-apps/vue'
 import type { TokenStore } from './tokenStore'
 
 type HomeMix = ReturnType<typeof useHomeMix>['homemix']

@@ -5,6 +5,4 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: './',
   plugins: [vue()],
-  // @homemix/vue is linked from the HomeApps checkout: use this app's Vue, not a second copy from there.
-  resolve: { dedupe: ['vue'] },
 })
