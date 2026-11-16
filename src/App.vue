@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useHomeMix } from '@homemix/vue'
+import { useHomeMix } from '@home-apps/vue'
 import { computed } from 'vue'
 import DashboardView from './components/DashboardView.vue'
 import LoginForm from './components/LoginForm.vue'
-import MonthWidget from './components/MonthWidget.vue'
+import ShiftWidget from './components/ShiftWidget.vue'
 import { useSession } from './composables/useSession'
 import { homeMixTokenStore } from './homemix/homeMixTokenStore'
 import { inHomeMix } from './homemix/inHomeMix'
@@ -23,7 +23,7 @@ const widget = computed(() => !!mix?.context.value?.widget)
 </script>
 
 <template>
-  <MonthWidget v-if="restored && widget" />
+  <ShiftWidget v-if="restored && widget" />
   <main v-else-if="restored" class="app">
     <DashboardView v-if="token" />
     <LoginForm v-else />
