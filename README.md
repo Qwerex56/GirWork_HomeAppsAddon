@@ -1,49 +1,60 @@
-# GIR Work Time Counter (web)
+# Czas pracy GIR
 
-Vue 3 + TypeScript + Vite. Shows worked and planned hours, the shift calendar, and lets you file shift requests.
+**Nieoficjalny** dodatek HomeMix do HomeApps: Twoje godziny, grafik i wnioski o zmianę z GIR w jednym miejscu.
+Nie jest związany z GIR ani Mapal; korzysta z tego samego API co ich aplikacja mobilna.
+
+Dodatek jest tylko dla **konta** (Moje aplikacje), nie dla domów.
+
+## Co robi
+
+- **Podsumowanie:** przepracowane i zaplanowane godziny oraz zarobek w tym miesiącu, w tym tygodniu i w poprzednim
+  miesiącu.
+- **Kalendarz zmian:** Twój grafik na miesiąc; kliknięcie dnia pokazuje, kto jest z Tobą na zmianie.
+- **Wnioski o zmianę:** zaznacz dni, wybierz typ (dzień pracujący, wolny, godziny pracy, nie przed lub nie po godzinie) i wyślij; lista wysłanych wniosków
+  z możliwością usunięcia.
+- **Widżet w Moich aplikacjach:** mały (godziny w tym miesiącu), średni (do tego plan, zarobek i następna zmiana)
+  albo duży (do tego lista nadchodzących zmian). Kliknięcie otwiera dodatek.
+
+## O co prosi i dlaczego
+
+| Uprawnienie | Po co |
+|---|---|
+| Twoje prywatne dane dodatku (`storage.user`) | zapamiętanie tokenu sesji GIR, żeby nie logować się za każdym razem; widzisz go tylko Ty |
+| `https://gotogir.com` | logowanie do GIR (Twój login i hasło idą tylko tam) |
+| `https://v5api.workforce.mapal-os.com` | grafik, czas pracy i wnioski o zmianę |
+
+Hasło nie jest nigdzie zapisywane. HomeApps nie dostaje żadnych danych z GIR poza tokenem sesji, a dodatek nie ma
+dostępu do niczego w HomeApps. „Wyloguj” usuwa token. Zdjęcia współpracowników z innych serwerów są blokowane przez
+sandbox, dlatego widać inicjały.
+
+## Instalacja
+
+Moje aplikacje → **Dodaj dodatek** → **Link do GitHuba** → link do tego repozytorium (bierze `addon.zip` z ostatniego
+wydania). Działa z HomeApps 2.4.0 lub nowszym.
+
+---
+
+## Dla autorów
+
+Vue 3 + TypeScript + Vite. Ta sama aplikacja działa samodzielnie (`npm run dev`, token w `localStorage`) i jako
+dodatek HomeMix (`src/homemix/`, token w `storage.user`).
 
 ```
 npm install
-npm run dev     # http://localhost:5173
-npm run build
+npm run dev     # sama aplikacja: http://localhost:5173
+npm run mix     # jako dodatek w udawanym HomeApps: http://localhost:5180 (wybierz „Moje konto”)
+npm run check   # sprawdzenia, które robi HomeApps przy dodawaniu
+npm run pack    # addon.zip z SHA-256
 ```
 
-## HomeMix add-on (HomeApps)
+Wydanie: podnieś `version` w `public/homemix.json`, commit, `git tag v1.1.0 && git push origin v1.1.0`. Workflow
+`.github/workflows/release.yml` sprawdza, że tag zgadza się z wersją, i dołącza `addon.zip` do wydania. Przewodnik:
+[docs/homemix-authoring.md](https://github.com/Qwerex56/HomeApps/blob/master/docs/homemix-authoring.md).
 
-The same app is an unofficial HomeMix add-on `gir-czas-pracy` for a person's own account (not households): a page
-"Czas pracy" and a widget with this month's hours in "Moje aplikacje". It only talks to GIR; HomeApps keeps the GIR
-session token in the person's private add-on data (`storage.user`), never the password.
+- `src/api/` – zapytania do GIR / Mapal i ich typy. Nic innego nie łączy się z siecią.
+- `src/domain/` – czyste funkcje bez Vue: daty i okna wniosków, godziny i zarobki, kody wniosków, grafik.
+- `src/composables/` – stan i akcje: sesja (token), czas pracy, wnioski, szczegóły zmiany.
+- `src/components/` – komponenty Vue; `App.vue` pokazuje logowanie, panel albo widżet (`ShiftWidget.vue`).
+- `src/homemix/` – działanie w HomeApps: wykrycie ramki i miejsce na token.
 
-The HomeMix tooling is not on npm yet, so it comes from the HomeApps checkout next to this folder
-(`~/Documents/RiderProjects/HomeApps`). Build it once (and again after pulling HomeApps):
-
-```
-cd ~/Documents/RiderProjects/HomeApps/src/Web && npm ci
-cd homemix && npm ci && npm run build
-```
-
-Then, here:
-
-```
-npm install
-npm run mix     # builds on every change and runs a fake HomeApps at http://localhost:5180 (pick "Moje konto")
-npm run check   # the checks HomeApps makes when the add-on is added
-npm run pack    # addon.zip with its SHA-256
-```
-
-In HomeApps: account menu → Moje aplikacje → Dodaj dodatek → Plik zip → `addon.zip`. A zip has no updates: to try a
-new build, remove the add-on and add the new zip (its data, the saved token, comes back for 30 days). Raise `version`
-in `public/homemix.json` with every zip you install.
-
-Inside HomeApps the app runs in a sandbox: no `localStorage` (`src/homemix/`), colleagues' photos from other sites
-are blocked (initials show instead), and GIR's API must answer CORS for the origin `null`.
-
-## Layout
-
-- `src/api/` – HTTP calls to the GIR / Mapal API and their response types. Nothing else talks to the network.
-- `src/domain/` – plain functions, no Vue: dates and request windows, hours and earnings, request type codes, roster names.
-- `src/composables/` – state and actions: session (token), work time, shift requests, shift details.
-- `src/components/` – presentational Vue components. `App.vue` shows the login form, the dashboard or the HomeMix widget.
-- `src/homemix/` – running inside HomeApps: detecting the frame and where the token is kept.
-
-The previous implementation lives in `.old/` for reference.
+Poprzednia wersja jest w `.old/`.
